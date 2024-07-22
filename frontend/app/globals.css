@@ -2,7 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  height: 100vh;
+  font-size: 14px;
+  background: url("../public/glass-bg.png") no-repeat center center fixed;
+}
+.active-nav {
+  color: #7263f3;
+}
+
+.dark body {
+  color: #f9f9f9;
+  background: url("../public/bg--blur-purple.png") no-repeat center center fixed;
+}
+
 .auth-page {
   height: 100vh;
   background: url("/glass-bg.png") no-repeat center center fixed;
+}
+
+@layer base {
+  .gradient-text {
+    @apply inline-block dark:bg-clip-text dark:text-transparent bg-gradient-to-r from-[#7263f3] to-[#f56693];
+  }
+}
+
+.epr-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.epr-body::-webkit-scrollbar-thumb {
+  background-color: #7263f3;
+  border-radius: 6px;
+}
+
+.epr-body::-webkit-scrollbar-track {
+  border-radius: 6px;
 }
