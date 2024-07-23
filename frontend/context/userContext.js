@@ -13,7 +13,6 @@ export const UserContextProvider = ({ children }) => {
   const router = useRouter();
 
   const [user, setUser] = useState({});
-  console.log("USER====>", user);
   const [allUsers, setAllUsers] = useState([]);
   const [userState, setUserState] = useState({
     name: "",
@@ -21,6 +20,7 @@ export const UserContextProvider = ({ children }) => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const loginStatus = async () => {
@@ -140,8 +140,7 @@ export const UserContextProvider = ({ children }) => {
     return loggedIn;
   };
 
-  const updateUser = async (e, data) => {
-    e.preventDefault();
+  const updateUser = async (data) => {
     console.log(data);
     try {
       const res = await axios.patch(`${serverUrl}/api/v1/user/update`, data, {
@@ -152,7 +151,7 @@ export const UserContextProvider = ({ children }) => {
       setUser((prevState) => {
         return {
           ...prevState,
-          ...res.data,
+          ...res.data.data,
         };
       });
 
@@ -302,6 +301,54 @@ export const UserContextProvider = ({ children }) => {
     }
   };
 
+  const searchUsers = async (query) => {
+    try {
+      const res = await axios.get(
+        `${serverUrl}/api/v1/user/search-users?q=${query}`,
+        {},
+        { withCredentials: true }
+      );
+      setSearchResults(res.data.data);
+    } catch (error) {
+      console.log("Error searching users", error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const sendFriendRequest = async (id) => {
+    try {
+      const res = await axios.post(`${serverUrl}/api/v1/friend-request`, id, {
+        withCredentials: true,
+      });
+
+      toast.success("Friend request sent successfully");
+
+      return res.data;
+    } catch (error) {
+      console.log("Error sending friend request", error);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const acceptFriendRequest = async (id) => {
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${serverUrl}/api/v1/user/friends/accept`,
+        id,
+        {
+          withCredentials: true,
+        }
+      );
+
+      toast.success("Friend request accepted successfully");
+      getUser();
+    } catch (error) {
+      console.log("Error accepting friend request", error);
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <userContext.Provider
       value={{
@@ -318,6 +365,11 @@ export const UserContextProvider = ({ children }) => {
         verifyUser,
         deleteUser,
         userLoginStatus,
+        searchUsers,
+        sendFriendRequest,
+        acceptFriendRequest,
+        searchResults,
+        setSearchResults,
       }}
     >
       {children}
