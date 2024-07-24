@@ -1,17 +1,19 @@
-import { useUserContext } from "@/context/userContext";
-import { navButtons } from "@/utils/constants";
-import { archive, chat, group, moon, sun } from "@/utils/Icons";
 import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
+
+import ChatItem from "../ChatItem/ChatItem";
 import SearchInput from "../SearchInput/SearchInput";
+import { useUserContext } from "@/context/userContext";
 import { useGlobalContext } from "@/context/globalContext";
 import { useChatContext } from "@/context/chatContext";
 import FriendRequests from "../FriendRequests/FriendRequests";
+import SearchResults from "../SearchResults/SearchResults";
 import { IChat, IUser } from "@/types/types";
-import ChatItem from "../ChatItem/ChatItem";
+import { navButtons } from "@/utils/constants";
+import { archive, chat, database, group, moon, sun } from "@/utils/Icons";
 
 function Sidebar() {
-  const { user, updateUser, logOutUser } = useUserContext();
+  const { user, updateUser, searchResults } = useUserContext();
   const { avatar, friendRequests } = user;
 
   const { allChatsData, handleSelectedChat, selectedChat } = useChatContext();
@@ -37,7 +39,10 @@ function Sidebar() {
   return (
     <div className="w-[25rem] flex border-r-2 border-white dark:border-[#3C3C3C]/60">
       <div className="p-4 flex flex-col justify-between items-center border-r-2 border-white dark:border-[#3C3C3C]/60">
-        <div className="profile flex flex-col items-center ">
+        <div
+          className="profile flex flex-col items-center "
+          onClick={() => handleProfileToggle(true)}
+        >
           <Image
             src={avatar}
             alt="profile"
@@ -71,7 +76,6 @@ function Sidebar() {
             );
           })}
         </div>
-        <button onClick={logOutUser}>logout</button>
         <div className="p-2 text-[#454e56] text-xl flex flex-col gap-2 border-2 border-white dark:border-[#3C3C3C]/65 rounded-[30px] shadow-sm dark:text-white/65">
           <button
             className={`${
@@ -99,6 +103,17 @@ function Sidebar() {
         <div className="px-4 mt-2">
           <SearchInput />
         </div>
+
+        {searchResults?.data?.length > 0 && (
+          <div className="mt-4">
+            <h4
+              className={`px-4 grid grid-cols-[22px_1fr] items-center font-bold dark:gradient-text dark:text-slate-200`}
+            >
+              {database} Search Results
+            </h4>
+            <SearchResults />
+          </div>
+        )}
 
         {currentView === "all-chats" && (
           <div className="mt-8">
