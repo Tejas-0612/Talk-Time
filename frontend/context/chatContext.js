@@ -57,7 +57,9 @@ export const ChatProvider = ({ children }) => {
             (user) => user._id !== userId
           );
 
-          const isFriends = onlineFriends.filter((user) => user._id == userId);
+          const isFriends = onlineFriends.filter((friend) =>
+            user?.friends?.includes(friend._id)
+          );
 
           setOnlineUsers(isFriends);
         } catch (error) {
@@ -146,7 +148,6 @@ export const ChatProvider = ({ children }) => {
   };
 
   const getAllChatsData = async () => {
-    console.log(chats);
     try {
       const updatedChats = await Promise.all(
         chats?.map(async (chat) => {
@@ -155,7 +156,6 @@ export const ChatProvider = ({ children }) => {
               .filter((participant) => participant !== userId)
               .map(async (participant) => {
                 const user = await getUserById(participant);
-                console.log(user);
                 return user;
               })
           );
@@ -171,12 +171,10 @@ export const ChatProvider = ({ children }) => {
   };
 
   const sendMessage = async (data) => {
-    console.log(data);
     try {
       const res = await axios.post(`${serverUrl}/api/v1/message/create`, data);
 
       setMessages((prev) => [...prev, res.data.data]);
-      console.log(res.data.data);
 
       setChats((prevChats) => {
         const updatedChats = prevChats.map((chat) => {

@@ -9,16 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@edgestore/react": "^0.2.1",
+    "@edgestore/server": "^0.2.1",
     "@hookform/resolvers": "^3.9.0",
     "axios": "^1.7.2",
+    "emoji-picker-react": "^4.11.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
     "react-hot-toast": "^2.4.1",
+    "socket.io-client": "^4.7.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -141,7 +141,6 @@ export const UserContextProvider = ({ children }) => {
   };
 
   const updateUser = async (data) => {
-    console.log(data);
     try {
       const res = await axios.patch(`${serverUrl}/api/v1/user/update`, data, {
         withCredentials: true, // send cookies to the server
@@ -272,7 +271,6 @@ export const UserContextProvider = ({ children }) => {
           withCredentials: true, // send cookies to the server
         }
       );
-      console.log(res.data);
 
       setAllUsers(res.data.data);
     } catch (error) {
