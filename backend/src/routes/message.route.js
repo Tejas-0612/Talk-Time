@@ -15,7 +15,7 @@ router.use(verifyJWT);
 router.post("/chats/create", createChat);
 router.get("/chats/:userId", getAllUserChats);
 
-router.post("/messages/create", createMessage);
+router.post("/message/create", createMessage);
 router.get("/messages/:chatId", getChatMessages);
 
 router.get("/user/:userId", getUserById);

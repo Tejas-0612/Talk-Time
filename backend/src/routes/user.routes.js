@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  acceptFriendRequest,
   changePassword,
   forgetPassword,
   getUser,
@@ -8,6 +9,8 @@ import {
   logoutUser,
   registerUser,
   resetPassword,
+  searchUsers,
+  sendFriendRequest,
   updateUser,
   userLoginStatus,
   verifyEmail,
@@ -31,5 +34,9 @@ router.post("/verify-user/:verificationToken", verifyUser);
 router.patch("/change-password", verifyJWT, changePassword);
 router.post("/forget-password", forgetPassword);
 router.post("/reset-password/:resetPasswordToken", resetPassword);
+
+router.get("/search-users", verifyJWT, searchUsers);
+router.post("/send-friend-request", verifyJWT, sendFriendRequest);
+router.post("/friends/accept", verifyJWT, acceptFriendRequest);
 
 export default router;

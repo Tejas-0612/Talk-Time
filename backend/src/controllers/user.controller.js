@@ -112,11 +112,12 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User does not exists");
   }
 
-  const { name, bio, avatar } = req.body;
+  const { name, bio, avatar, theme } = req.body;
 
   user.name = name || user.name;
   user.bio = bio || user.bio;
   user.avatar = avatar || user.avatar;
+  user.theme = theme || user.theme;
 
   const updatedUser = await user.save();
 
@@ -318,6 +319,105 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password reset Successfully"));
 });
 
+const searchUsers = asyncHandler(async (req, res) => {
+  const query = req.query.q;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
+  try {
+    const userId = req.user._id;
+
+    const users = await User.find({
+      name: { $regex: query, $options: "i" },
+      _id: { $ne: userId },
+    })
+      .select("-password")
+      .limit(limit)
+      .skip(skip);
+
+    const totalUsers = await User.countDocuments({
+      name: { $regex: query, $options: "i" },
+      _id: { $ne: userId },
+    });
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          data: users,
+          currentPage: page,
+          totalPages: Math.ceil(totalUsers / limit),
+          totalResults: totalUsers,
+        },
+        "Search result get successfully"
+      )
+    );
+  } catch (error) {
+    throw new ApiError(400, "Error while searching users");
+  }
+});
+
+const sendFriendRequest = asyncHandler(async (req, res) => {
+  try {
+    const requestingUser = req.user._id;
+
+    const { recipientId } = req.body;
+
+    const recipient = await User.findById(recipientId);
+
+    if (!recipient) {
+      throw new ApiError(400, "Recipient not found");
+    }
+
+    if (recipient.friendRequests.push(requestingUser)) {
+      throw new ApiError(400, "Friend request already sent");
+    }
+
+    recipient.friendRequests.push(requestingUser);
+    await recipient.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Friend request sent"));
+  } catch (error) {
+    throw new ApiError(400, "Error sending friend request");
+  }
+});
+
+const acceptFriendRequest = asyncHandler(async (req, res) => {
+  try {
+    const recipientId = req.user._id;
+    const { requestingUserId } = req.body;
+
+    const recipient = await User.findById(recipientId);
+    const requestingUser = await User.findById(requestingUserId);
+
+    if (!recipient || !requestingUser) {
+      throw new ApiError(404, "User not found");
+    }
+
+    const requestIndex = recipient.friendRequests.indexOf(requestingUserId);
+
+    if (requestIndex === -1) {
+      throw new ApiError(400, "Friend request not found");
+    }
+
+    recipient.friends.push(requestingUserId);
+    requestingUser.friends.push(recipientId);
+    recipient.friendRequests.splice(requestIndex, 1);
+
+    await recipient.save();
+    await requestingUser.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Friend request accepted"));
+  } catch (error) {
+    throw new ApiError(500, "Error accepting friend request");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -330,4 +430,7 @@ export {
   changePassword,
   forgetPassword,
   resetPassword,
+  searchUsers,
+  sendFriendRequest,
+  acceptFriendRequest,
 };
