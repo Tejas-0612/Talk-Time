@@ -6,7 +6,7 @@ import io from "socket.io-client";
 
 const ChatContext = createContext();
 
-const serverUrl = "http://localhost:8000";
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export const ChatProvider = ({ children }) => {
   const { user, setUser } = useUserContext();
